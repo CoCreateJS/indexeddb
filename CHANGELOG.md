@@ -1,3 +1,12 @@
+## [1.23.5](https://github.com/CoCreate-app/CoCreate-indexeddb/compare/v1.23.4...v1.23.5) (2026-07-11)
+
+
+### Bug Fixes
+
+* bump package versions ([34cf4ac](https://github.com/CoCreate-app/CoCreate-indexeddb/commit/34cf4ac4d95009cfe6981d461eeff8ffca3e2ca4))
+* removed post install and add add packages to apprved list ([7b03908](https://github.com/CoCreate-app/CoCreate-indexeddb/commit/7b039085716a3b63fc15a166dae06a60c2f3c5a2))
+* semantic version handling ([0e6aa43](https://github.com/CoCreate-app/CoCreate-indexeddb/commit/0e6aa43075f0e913e15bc5a05d0effe9c39e37a1))
+
 ## [1.23.4](https://github.com/CoCreate-app/CoCreate-indexeddb/compare/v1.23.3...v1.23.4) (2026-02-04)
 
 
