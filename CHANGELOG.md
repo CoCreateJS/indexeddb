@@ -1,3 +1,10 @@
+# [1.24.0](https://github.com/CoCreate-app/CoCreate-indexeddb/compare/v1.23.5...v1.24.0) (2026-07-17)
+
+
+### Features
+
+* update automated workflow and release configuration for improved semantic release handling ([a3dad53](https://github.com/CoCreate-app/CoCreate-indexeddb/commit/a3dad53165b0ee04ba4936b8923ed5a14c65c3fa))
+
 ## [1.23.5](https://github.com/CoCreate-app/CoCreate-indexeddb/compare/v1.23.4...v1.23.5) (2026-07-11)
 
 
