@@ -1,3 +1,10 @@
+## [1.24.2](https://github.com/CoCreate-app/CoCreate-indexeddb/compare/v1.24.1...v1.24.2) (2026-07-19)
+
+
+### Bug Fixes
+
+* set default branch to main ([57eef3f](https://github.com/CoCreate-app/CoCreate-indexeddb/commit/57eef3f116e554885abe324e57e8de646a6a6a63))
+
 ## [1.24.1](https://github.com/CoCreate-app/CoCreate-indexeddb/compare/v1.24.0...v1.24.1) (2026-07-17)
 
 
