@@ -34,10 +34,13 @@ import {
 } from "@cocreate/utils";
 
 let indexedDbFunction;
+const isBrowser = typeof window !== "undefined";
 
 function init() {
 	// Check for support.
-	if (!("indexedDB" in window)) {
+	if (!isBrowser) {
+		return;
+	} else if (!("indexedDB" in window)) {
 		console.log("This browser doesn't support IndexedDB.");
 		setStatus(false);
 		return;
