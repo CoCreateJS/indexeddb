@@ -13,7 +13,7 @@ Fork the [project on Github](https://github.com/CoCreate-app/CoCreate-indexeddb)
 ```
 git clone https://github.com/contributor/CoCreate-indexeddb.git
 cd CoCreate-indexeddb
-git remote add upstream https://github.com/CoCreate-app/CoCreate-indexeddb.git
+git remote add upstream https://gitlab.com/cocreatejs/CoCreate-indexeddb.git
 ```
 
 ## Create a Topic Branch
