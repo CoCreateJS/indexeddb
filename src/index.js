@@ -129,10 +129,10 @@ const processDatabase = (data, newData, type) => {
 			if (data.method == "database.read") {
 				indexedDB.databases().then((databases) => {
 					for (let database of databases) {
-						if (data.$filter && data.$filter.query) {
+						if (data.filter && data.filter.query) {
 							let isFilter = queryData(
 								database,
-								data.$filter.query
+								data.filter.query
 							);
 							if (isFilter)
 								newData.push({
@@ -322,10 +322,10 @@ async function processArray(data, newData, database, type) {
 		}
 
 		for (let i = 0; i < objectStoreNames.length; i++) {
-			if (data.$filter && data.$filter.query) {
+			if (data.filter && data.filter.query) {
 				let isFilter = queryData(
 					{ name: objectStoreNames[i] },
-					data.$filter.query
+					data.filter.query
 				);
 				if (isFilter)
 					newData.push({
@@ -430,8 +430,8 @@ async function processIndex(data, newData, database, array, type) {
 		if (data.method == "index.read") {
 			for (let i = 0; i < indexNames.length; i++) {
 				let name = indexNames[i];
-				if (data.$filter && data.$filter.query)
-					if (!queryData({ name }, data.$filter.query)) continue;
+				if (data.filter && data.filter.query)
+					if (!queryData({ name }, data.filter.query)) continue;
 
 				newData.push({
 					name,
@@ -507,7 +507,7 @@ async function processObject(data, newData, database, array, type) {
 		else if (!Array.isArray(data[type])) data[type] = [data[type]];
 
 		let isFilter;
-		if (data.$filter) isFilter = true;
+		if (data.filter) isFilter = true;
 
 		let arrayExist = db.objectStoreNames.contains(array);
 		if (!arrayExist) {
@@ -578,7 +578,7 @@ async function processObject(data, newData, database, array, type) {
 				data[type][i] = await add(objectStore, data[type][i]);
 				data[type][i] = { ...reference, ...data[type][i] };
 			} else {
-				if (data[type][i].$filter) isFilter = true;
+				if (data[type][i].filter) isFilter = true;
 
 				if (data.method == "object.update") {
 					if (data.organization_id)
@@ -603,12 +603,12 @@ async function processObject(data, newData, database, array, type) {
 					let indexName;
 					let indexFields;
 
-					if (data.$filter) {
+					if (data.filter) {
 						// TODO: requires a more robust sorting thats suports various directions
 						// Build compound index name from sort keys
-						if (data.$filter.sort && data.$filter.sort.length > 0) {
+						if (data.filter.sort && data.filter.sort.length > 0) {
 							// Create a standard index name without _id
-							let sortKeys = data.$filter.sort
+							let sortKeys = data.filter.sort
 								.map((sort) => sort.key)
 								.filter((key) => key !== "_id");
 							indexName = sortKeys.join("_"); // e.g., "createdAt_category"
@@ -618,7 +618,7 @@ async function processObject(data, newData, database, array, type) {
 
 							// Set cursor direction based on the first sort key direction
 							direction =
-								data.$filter.sort[0].direction === "desc"
+								data.filter.sort[0].direction === "desc"
 									? "prev"
 									: "next";
 
@@ -645,43 +645,43 @@ async function processObject(data, newData, database, array, type) {
 								}
 							}
 						} else if (
-							data.$filter.query &&
-							data.$filter.query[0] &&
-							data.$filter.query[0].key
+							data.filter.query &&
+							data.filter.query[0] &&
+							data.filter.query[0].key
 						) {
-							if (data.$filter.query[0].operator === "$eq") {
+							if (data.filter.query[0].operator === "$eq") {
 								range = IDBKeyRange.only(
-									data.$filter.query[0].value
+									data.filter.query[0].value
 								);
 							} else if (
-								data.$filter.query[0].operator === "$gt"
+								data.filter.query[0].operator === "$gt"
 							) {
 								range = IDBKeyRange.lowerBound(
-									data.$filter.query[0].value,
+									data.filter.query[0].value,
 									true
 								);
 							} else if (
-								data.$filter.query[0].operator === "$lt"
+								data.filter.query[0].operator === "$lt"
 							) {
 								range = IDBKeyRange.upperBound(
-									data.$filter.query[0].value,
+									data.filter.query[0].value,
 									true
 								);
 							} else if (
-								data.$filter.query[0].operator === "$gte"
+								data.filter.query[0].operator === "$gte"
 							) {
 								range = IDBKeyRange.lowerBound(
-									data.$filter.query[0].value
+									data.filter.query[0].value
 								);
 							} else if (
-								data.$filter.query[0].operator === "$lte"
+								data.filter.query[0].operator === "$lte"
 							) {
 								range = IDBKeyRange.upperBound(
-									data.$filter.query[0].value
+									data.filter.query[0].value
 								);
 							}
 
-							indexName = data.$filter.query[0].key;
+							indexName = data.filter.query[0].key;
 						}
 					}
 
@@ -705,21 +705,21 @@ async function processObject(data, newData, database, array, type) {
 
 					let count = objectStore.count();
 					count.onsuccess = function () {
-						if (data.$filter) data.$filter.count = count.result;
-						else if (data.object.$filter)
-							data.object.$filter.count = count.result;
+						if (data.filter) data.filter.count = count.result;
+						else if (data.object.filter)
+							data.object.filter.count = count.result;
 					};
 
-					if (data.$filter) {
-						if (data.$filter.index) index = data.$filter.index;
-						if (data.$filter.limit) limit = data.$filter.limit;
+					if (data.filter) {
+						if (data.filter.index) index = data.filter.index;
+						if (data.filter.limit) limit = data.filter.limit;
 					}
 
-					if (data[type][i].$filter) {
-						if (data[type][i].$filter.index)
-							index = data[type][i].$filter.index;
-						if (data[type][i].$filter.limit)
-							limit = data[type][i].$filter.limit;
+					if (data[type][i].filter) {
+						if (data[type][i].filter.index)
+							index = data[type][i].filter.index;
+						if (data[type][i].filter.limit)
+							limit = data[type][i].filter.limit;
 					}
 				} else if (
 					data.method == "object.delete" ||
@@ -947,7 +947,7 @@ function cursorUpdate(cursor, update) {
 
 function filter(objectStore, data, object, result) {
 	let isMatch = true;
-	let filter = data.$filter || object.$filter;
+	let filter = data.filter || object.filter;
 	if (filter) {
 		if (filter.query) isMatch = queryData(result, filter.query);
 		if (isMatch && filter.search)
@@ -980,12 +980,12 @@ function createData(data, newData, type) {
 
 	data[type].push(...newData);
 
-	if (data.$filter) {
-		if (data.$filter.sort)
-			data[type] = sortData(data[type], data.$filter.sort);
+	if (data.filter) {
+		if (data.filter.sort)
+			data[type] = sortData(data[type], data.filter.sort);
 
-		data.$filter.startingIndex = data.$filter.index;
-		data.$filter.index += data[type].length;
+		data.filter.startingIndex = data.filter.index;
+		data.filter.index += data[type].length;
 	}
 
 	return data;
