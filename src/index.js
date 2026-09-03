@@ -571,10 +571,12 @@ async function processObject(data, newData, database, array, type) {
 				data[type][i] = dotNotationToObject(data[type][i]);
 
 				// TODO: user_id || clientId shohould be retrieved from CoCreate
-				data[type][i]["created"] = {
+				const audit = {
 					on: data.timeStamp,
 					by: data.user_id || data.clientId
 				};
+				data[type][i]["created"] = { ...audit };
+				data[type][i]["modified"] = { ...audit };
 				data[type][i] = await add(objectStore, data[type][i]);
 				data[type][i] = { ...reference, ...data[type][i] };
 			} else {
