@@ -36,6 +36,27 @@ import {
 let indexedDbFunction;
 const isBrowser = typeof window !== "undefined";
 
+function getSortPlan(filter) {
+    const sort = filter?.sort?.filter((item) => item?.key) || [];
+    const primary = sort[0];
+    return {
+        sort,
+        primary,
+        indexName: primary?.key !== "_id" && !primary?.key.includes("-")
+            ? primary.key
+            : undefined,
+        direction: primary?.direction === "desc" ? "prev" : "next"
+    };
+}
+
+function countRecords(source) {
+    return new Promise((resolve, reject) => {
+        const request = source.count();
+        request.onsuccess = () => resolve(request.result);
+        request.onerror = () => reject(request.error);
+    });
+}
+
 function init() {
     // Check for support.
     if (!isBrowser) {
@@ -606,46 +627,11 @@ async function processObject(data, newData, database, array, type) {
                     let indexFields;
 
                     if (data.filter) {
-                        // TODO: requires a more robust sorting thats suports various directions
-                        // Build compound index name from sort keys
-                        if (data.filter.sort && data.filter.sort.length > 0) {
-                            // Create a standard index name without _id
-                            let sortKeys = data.filter.sort
-                                .map((sort) => sort.key)
-                                .filter((key) => key !== "_id");
-                            indexName = sortKeys.join("_"); // e.g., "createdAt_category"
-
-                            // Define compound index fields
-                            indexFields = [...sortKeys];
-
-                            // Set cursor direction based on the first sort key direction
-                            direction =
-                                data.filter.sort[0].direction === "desc"
-                                    ? "prev"
-                                    : "next";
-
-                            // Use last item's values, including _id, to set up the range for pagination
-                            if (indexName && lastItem && lastItem._id) {
-                                indexName += "_id";
-                                indexFields.push("_id");
-                                let lastKeyValues = [
-                                    ...sortKeys.map((key) => lastItem[key]),
-                                    lastItem._id
-                                ]; // Compound key array with _id
-
-                                // Create IDBKeyRange based on direction and lastKeyValues
-                                if (direction === "next") {
-                                    range = IDBKeyRange.lowerBound(
-                                        lastKeyValues,
-                                        true
-                                    );
-                                } else {
-                                    range = IDBKeyRange.upperBound(
-                                        lastKeyValues,
-                                        true
-                                    );
-                                }
-                            }
+                        const sortPlan = getSortPlan(data.filter);
+                        if (sortPlan.primary) {
+                            direction = sortPlan.direction;
+                            indexName = sortPlan.indexName;
+                            indexFields = sortPlan.primary.key;
                         } else if (
                             data.filter.query &&
                             data.filter.query[0] &&
@@ -702,7 +688,18 @@ async function processObject(data, newData, database, array, type) {
                             transaction = db.transaction(array, "readwrite");
                             objectStore = transaction.objectStore(array);
                         }
-                        objectStore = objectStore.index(indexName);
+                        const selectedIndex = objectStore.index(indexName);
+                        if (getSortPlan(data.filter).primary) {
+                            const [recordCount, indexCount] = await Promise.all([
+                                countRecords(objectStore),
+                                countRecords(selectedIndex)
+                            ]);
+                            if (recordCount === indexCount)
+                                objectStore = selectedIndex;
+                            else direction = undefined;
+                        } else {
+                            objectStore = selectedIndex;
+                        }
                     }
 
                     let count = objectStore.count();
@@ -713,8 +710,12 @@ async function processObject(data, newData, database, array, type) {
                     };
 
                     if (data.filter) {
-                        if (data.filter.index) index = data.filter.index;
-                        if (data.filter.limit) limit = data.filter.limit;
+                        const sortPlan = getSortPlan(data.filter);
+                        if (!sortPlan.sort.length) {
+                            if (data.filter.index && !lastItem)
+                                index = data.filter.index;
+                            if (data.filter.limit) limit = data.filter.limit;
+                        }
                     }
 
                     if (data[type][i].filter) {
@@ -983,11 +984,20 @@ function createData(data, newData, type) {
     data[type].push(...newData);
 
     if (data.filter) {
-        if (data.filter.sort)
+        const sortPlan = getSortPlan(data.filter);
+        const startingIndex = data.filter.index || 0;
+        if (sortPlan.sort.length) {
             data[type] = sortData(data[type], data.filter.sort);
+            data[type] = data[type].slice(
+                startingIndex,
+                data.filter.limit
+                    ? startingIndex + data.filter.limit
+                    : undefined
+            );
+        }
 
-        data.filter.startingIndex = data.filter.index;
-        data.filter.index += data[type].length;
+        data.filter.startingIndex = startingIndex;
+        data.filter.index = startingIndex + data[type].length;
     }
 
     return data;
