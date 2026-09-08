@@ -57,6 +57,30 @@ function countRecords(source) {
     });
 }
 
+function getFilterStorage(filter, storage, database, array) {
+    if (!filter) return;
+    if (!Array.isArray(filter.storages)) filter.storages = [];
+
+    let metadata = filter.storages.find(
+        (item) =>
+            item.storage === storage &&
+            item.database === database &&
+            item.array === array
+    );
+
+    if (!metadata) {
+        metadata = { storage, database, array };
+        filter.storages.push(metadata);
+    }
+
+    return metadata;
+}
+
+function includesReference(value, expected) {
+    const values = Array.isArray(value) ? value : [value];
+    return values.includes(expected);
+}
+
 function init() {
     // Check for support.
     if (!isBrowser) {
@@ -527,8 +551,15 @@ async function processObject(data, newData, database, array, type) {
             data[type] = [{ _id: data[type] }];
         else if (!Array.isArray(data[type])) data[type] = [data[type]];
 
-        let isFilter;
-        if (data.filter) isFilter = true;
+        let isFilter = Boolean(
+            data.filter && data.filter.isFilter !== false
+        );
+        const filterStorage = isFilter
+            ? getFilterStorage(data.filter, "indexeddb", database, array)
+            : undefined;
+        const filterStartingIndex =
+            filterStorage?.index ?? data.filter?.index ?? 0;
+        if (filterStorage) filterStorage.startingIndex = filterStartingIndex;
 
         let arrayExist = db.objectStoreNames.contains(array);
         if (!arrayExist) {
@@ -556,7 +587,10 @@ async function processObject(data, newData, database, array, type) {
             throw new Error({ error: "This is an error message.", db, array });
 
         let lastItem;
-        if ((isFilter && !data[type].length) || data.isFilter) {
+        if (
+            (isFilter && !data[type].length) ||
+            data.filter?.isFilter === true
+        ) {
             if (data[type].length) lastItem = data[type][data[type].length - 1];
             data[type] = [{ isFilter: "isEmptyObjectFilter" }];
 
@@ -596,8 +630,10 @@ async function processObject(data, newData, database, array, type) {
                     on: data.timeStamp,
                     by: data.user_id || data.clientId
                 };
-                data[type][i]["created"] = { ...audit };
-                data[type][i]["modified"] = { ...audit };
+                if (!data.synced) {
+                    data[type][i]["created"] = { ...audit };
+                    data[type][i]["modified"] = { ...audit };
+                }
                 data[type][i] = await add(objectStore, data[type][i]);
                 data[type][i] = { ...reference, ...data[type][i] };
             } else {
@@ -609,7 +645,7 @@ async function processObject(data, newData, database, array, type) {
 
                     if (data[type][i].$upsert) upsert = data[type][i].$upsert;
                     // TODO: user_id || clientId shohould be retrieved from CoCreate
-                    if (!data[type][i].modified)
+                    if (!data.synced)
                         data[type][i].modified = {
                             on: data.timeStamp,
                             by: data.user_id || data.clientId
@@ -704,7 +740,10 @@ async function processObject(data, newData, database, array, type) {
 
                     let count = objectStore.count();
                     count.onsuccess = function () {
-                        if (data.filter) data.filter.count = count.result;
+                        if (data.filter) {
+                            data.filter.count = count.result;
+                            filterStorage.count = count.result;
+                        }
                         else if (data.object.filter)
                             data.object.filter.count = count.result;
                     };
@@ -712,8 +751,8 @@ async function processObject(data, newData, database, array, type) {
                     if (data.filter) {
                         const sortPlan = getSortPlan(data.filter);
                         if (!sortPlan.sort.length) {
-                            if (data.filter.index && !lastItem)
-                                index = data.filter.index;
+                            if (filterStartingIndex && !lastItem)
+                                index = filterStartingIndex;
                             if (data.filter.limit) limit = data.filter.limit;
                         }
                     }
@@ -752,7 +791,6 @@ async function processObject(data, newData, database, array, type) {
                     reference
                 );
 
-                if (index) newData = newData.slice(index);
             }
         }
 
@@ -978,7 +1016,7 @@ function createData(data, newData, type) {
         data[type][0].isFilter === "isEmptyObjectFilter"
     ) {
         data[type].shift();
-        data.isFilter = true;
+        data.filter.isFilter = true;
     }
 
     data[type].push(...newData);
@@ -994,6 +1032,21 @@ function createData(data, newData, type) {
                     ? startingIndex + data.filter.limit
                     : undefined
             );
+        }
+
+        if (Array.isArray(data.filter.storages)) {
+            for (const metadata of data.filter.storages) {
+                if (metadata.storage !== "indexeddb") continue;
+
+                const returned = data[type].filter(
+                    (item) =>
+                        includesReference(item.$storage, metadata.storage) &&
+                        includesReference(item.$database, metadata.database) &&
+                        includesReference(item.$array, metadata.array)
+                ).length;
+
+                metadata.index = (metadata.startingIndex || 0) + returned;
+            }
         }
 
         data.filter.startingIndex = startingIndex;
