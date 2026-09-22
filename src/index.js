@@ -42,7 +42,7 @@ function getSortPlan(filter) {
     return {
         sort,
         primary,
-        indexName: primary?.key !== "_id" && !primary?.key.includes("-")
+        indexName: primary && primary.key !== "_id" && !primary.key.includes("-")
             ? primary.key
             : undefined,
         direction: primary?.direction === "desc" ? "prev" : "next"
