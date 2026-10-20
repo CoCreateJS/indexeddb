@@ -632,7 +632,7 @@ async function processObject(data, newData, database, array, type) {
                 };
                 if (!data.synced) {
                     data[type][i]["created"] = { ...audit };
-                    data[type][i]["modified"] = { ...audit };
+                    data[type][i]["updated"] = { ...audit };
                 }
                 data[type][i] = await add(objectStore, data[type][i]);
                 data[type][i] = { ...reference, ...data[type][i] };
@@ -646,7 +646,7 @@ async function processObject(data, newData, database, array, type) {
                     if (data[type][i].$upsert) upsert = data[type][i].$upsert;
                     // TODO: user_id || clientId shohould be retrieved from CoCreate
                     if (!data.synced)
-                        data[type][i].modified = {
+                        data[type][i].updated = {
                             on: data.timeStamp,
                             by: data.user_id || data.clientId
                         };
