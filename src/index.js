@@ -624,6 +624,7 @@ async function processObject(data, newData, database, array, type) {
                 if (!data[type][i]._id)
                     data[type][i]["_id"] = ObjectId().toString();
                 data[type][i] = dotNotationToObject(data[type][i]);
+                delete data[type][i].modified;
 
                 // TODO: user_id || clientId shohould be retrieved from CoCreate
                 const audit = {
@@ -650,6 +651,8 @@ async function processObject(data, newData, database, array, type) {
                             on: data.timeStamp,
                             by: data.user_id || data.clientId
                         };
+                    // Remove legacy object audit metadata from existing records.
+                    data[type][i].modified = undefined;
                 }
 
                 let index = 0,
@@ -864,6 +867,7 @@ function openCursor(
                             data[type][i],
                             globalOperators
                         );
+                        delete data[type][i].modified;
                         if (update) {
                             await put(objectStore, update);
                             data[type][i].$update = update;
@@ -897,6 +901,7 @@ function openCursor(
                                 data[type][i],
                                 globalOperators
                             );
+                            delete data[type][i].modified;
                             if (update) await cursorUpdate(cursor, update);
                             result = data[type][i];
                             result.$update = update;
