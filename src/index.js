@@ -374,7 +374,7 @@ async function processArray(data, newData, database, type) {
                 );
                 if (isFilter)
                     newData.push({
-                        name: objectStoreNames,
+                        name: objectStoreNames[i],
                         $storage: ["indexeddb"],
                         $database: [database]
                     });
