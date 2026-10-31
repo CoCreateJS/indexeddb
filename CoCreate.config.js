@@ -12,8 +12,8 @@ module.exports = {
                 "pathname": "/docs/indexeddb/index.html",
                 "src": "{{./docs/index.html}}",
                 "host": [
-                    "cocreate.app",
-                    "general.cocreate.app"
+                    "CoCreateJS.com",
+                    "general.CoCreateJS.com"
                 ],
                 "directory": "indexeddb",
                 "content-type": "{{content-type}}",
