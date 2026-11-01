@@ -116,6 +116,12 @@ function setStatus(value) {
     }
 }
 
+/**
+ * Route a CoCreate CRUD request to the matching database, array, or object operation.
+ *
+ * @public
+ * @environment client
+ */
 async function send(data) {
     try {
         let newData = [];
@@ -1075,3 +1081,18 @@ function errorHandler(data, error, database, array) {
 init();
 
 export default { send, ObjectId };
+
+/**
+ * Object identifier constructor exposed by the IndexedDB adapter.
+ *
+ * @name ObjectId
+ * @public
+ * @environment client
+ */
+
+/**
+ * A simple indexeddb component in vanilla javascript. Easily configured using HTML5 data-attributes and/or JavaScript API.
+ *
+ * @module indexeddb
+ * @environment client
+ */
