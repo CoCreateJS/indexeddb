@@ -1,3 +1,38 @@
+# [2.0.0](https://github.com/CoCreateJS/indexeddb/compare/v1.24.2...v2.0.0) (2026-11-02)
+
+
+### Bug Fixes
+
+* add "type": "module" to package.json ([67dcadf](https://github.com/CoCreateJS/indexeddb/commit/67dcadff5fb1924f3e98803d322ef82cbc5d5261))
+* add Deno specific entries to .gitignore ([39e4cef](https://github.com/CoCreateJS/indexeddb/commit/39e4cefdf5eadc2bf39832c10e38ce02dbe02c6c))
+* bump [@cocreate](https://github.com/cocreate) dependencies ([afc3696](https://github.com/CoCreateJS/indexeddb/commit/afc36968164154c1af7e3bd01f9b757546793724))
+* bump [@cocreate](https://github.com/cocreate) package versions ([e91e09a](https://github.com/CoCreateJS/indexeddb/commit/e91e09aba7ea6116d62aabbe754aa9a9c9ba57f2))
+* bump versions ([07050e2](https://github.com/CoCreateJS/indexeddb/commit/07050e2a1784a800a34e56d53321e408a75b49e0))
+* bump versions ([4bd57c5](https://github.com/CoCreateJS/indexeddb/commit/4bd57c5103d2f73aa3229cf29d5e345e142f2e1b))
+* improve browser support check for IndexedDB ([b10aae3](https://github.com/CoCreateJS/indexeddb/commit/b10aae3ea30d80a48593216e768103ebd5f474fe))
+* remove trailing slash from node_modules entry in .gitignore ([2a95d76](https://github.com/CoCreateJS/indexeddb/commit/2a95d7683137277ec3895bbdff0807077004774c))
+* reorder dependencies in package.json ([61e5d49](https://github.com/CoCreateJS/indexeddb/commit/61e5d49ad66c1c3732bdc05d806352e09727e9ab))
+* replace legacy $filter field with filter ([7b0bfe8](https://github.com/CoCreateJS/indexeddb/commit/7b0bfe81726aed85b83c318dc000690cde6cef4b))
+* return matching names for filtered reads ([6280889](https://github.com/CoCreateJS/indexeddb/commit/62808890ae5f046fe7f85ab9050005d4659b4978))
+* update git url ([a4b4a65](https://github.com/CoCreateJS/indexeddb/commit/a4b4a65b4e24ef7b5819a6489c084e1b5c0c16ad))
+* update GitHub Actions to use latest versions and sync package.json description ([89a8fc3](https://github.com/CoCreateJS/indexeddb/commit/89a8fc37aad3c68e49fd87838e5bbc3febde6997))
+
+
+### chore
+
+* record package identity migration as breaking ([7ddc3fb](https://github.com/CoCreateJS/indexeddb/commit/7ddc3fbafa25565c41bf2f688724d2d68e1b3060))
+
+
+### Features
+
+* add modified audit metadata on create ([741d7b8](https://github.com/CoCreateJS/indexeddb/commit/741d7b8b5697243f95446c82940bdf8bb5880581))
+* improve indexeddb sorting and pagination ([a01b76e](https://github.com/CoCreateJS/indexeddb/commit/a01b76e0b0d72e28db3a4d8d0cf66bae7315a249))
+
+
+### BREAKING CHANGES
+
+* Consumers must install @cocreate/indexeddb and use the CoCreateJS repository identity; previous package and repository identities are no longer supported.
+
 ## [1.24.2](https://github.com/CoCreateJS/CoCreate-indexeddb/compare/v1.24.1...v1.24.2) (2026-07-19)
 
 
