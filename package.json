@@ -37,10 +37,10 @@
   "type": "module",
   "main": "./src/index.js",
   "devDependencies": {
-    "@cocreate/webpack": "^2.0.0"
+    "@cocreate/webpack": "^2.0.1"
   },
   "dependencies": {
-    "@cocreate/utils": "^2.0.0"
+    "@cocreate/utils": "^2.0.2"
   },
   "allowScripts": {
     "@cocreate/utils@1.42.2": true,
