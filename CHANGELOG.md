@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/CoCreateJS/indexeddb/compare/v2.0.1...v2.0.2) (2026-11-07)
+
+
+### Bug Fixes
+
+* bump CoCreate dependency versions ([59b3e31](https://github.com/CoCreateJS/indexeddb/commit/59b3e315f313e126260e8c07839d8794a72af385))
+
 ## [2.0.1](https://github.com/CoCreateJS/indexeddb/compare/v2.0.0...v2.0.1) (2026-11-05)
 
 
